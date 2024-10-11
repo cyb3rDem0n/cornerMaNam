@@ -1,6 +1,27 @@
 import re
+from data import *
 
-def analizza_stringa(stringa):
+def appl_substring_find(dict, appl_string):
+    # Variabili per salvare i risultati
+    no_in_appl = ""
+    other = appl_string
+
+    # Loop per cercare le chiavi del dizionario nella stringa
+    for chiave, valore in dict.items():
+        if chiave in appl_string:
+         no_in_appl += f"{chiave}: {valore}, "
+        # Rimuovi la sottostringa trovata dalla variabile other
+        other = other.replace(chiave, "")
+
+    # Rimuoviamo l'ultima virgola e spazio extra in no_in_appl
+    no_in_appl = no_in_appl.rstrip(", ")
+
+    return no_in_appl + "," + other
+
+
+
+#####
+def naming_analyzer(stringa):
     # Step 1: Identificazione dell'ambiente
     if stringa[1].isdigit():
         ambiente = stringa[:2]
@@ -37,30 +58,53 @@ def analizza_stringa(stringa):
         sorgente_destinazione = resto
     else:
         # Nessuna applicazione MFT o SFT trovata, quindi il resto va considerato come "Altro"
-        applicazione = None
+        # Devo cercare un applicazione presente in appl{}
+        temp_string = appl_substring_find(appl,resto).split(',')
+        applicazione = temp_string[0].strip()
         sorgente_destinazione = None
-        altro = resto
+        altro = temp_string[1].strip()
 
     # Creiamo il dizionario risultato
-    risultato = {
-        'ambiente': ambiente,
-        'funzione': funzione,
-        'tipo_schedulazione': tipo_schedulazione,
-        'area': area,
-        'frequenza_schedulazione': frequenza_schedulazione,
-        'applicazione': applicazione if applicazione else 'N/A',
-        'sorgente_destinazione' if applicazione else 'altro': sorgente_destinazione if applicazione else altro
-    }
+    
+    if sorgente_destinazione != None:
+        risultato = {
+            'ambiente': ambiente,
+            'funzione': funzione,
+            'tipo_schedulazione': tipo_schedulazione,
+            'area': area,
+            'frequenza_schedulazione': frequenza_schedulazione,
+            'applicazione': applicazione, #if applicazione else 'N/A',
+            'sorgente_destinazione' : sorgente_destinazione #if applicazione else 'altro': sorgente_destinazione if applicazione else altro
+        }
+    else:
+        risultato = {
+            'ambiente': ambiente,
+            'funzione': funzione,
+            'tipo_schedulazione': tipo_schedulazione,
+            'area': area,
+            'frequenza_schedulazione': frequenza_schedulazione,
+            'applicazione': applicazione,
+            'other_info' : altro 
+            }
+
 
     return risultato
 
-# Esempio di utilizzo
-stringhe = [
+
+
+
+# TEST
+jobs = [
+    'PSMJEBANDATAFEEDCEREPORTCHE',
     'R1INJCCCHMFTCCMSSAPG',
     'T3BAZCCCHAUTHDMDUFDAILYUPDG',
     'R1BAJCCCHB1AL3E'
 ]
 
-for s in stringhe:
-    risultato = analizza_stringa(s)
-    print(f"Risultato per {s}: {risultato}\n")
+for s in jobs:
+    risultato = naming_analyzer(s)
+    print(f"|JOB NAME: {s}|")
+    for key, value in risultato.items():
+        print(f"{key}: {value}")
+    print("#" * 40)
+    

@@ -37,6 +37,7 @@ fun = {
     "":"Tecnici Sistema",
     "":"Tecnici Test",
     "":"Tecnici UC4",
+    "SR":""
 }
 
 sched_type = {
@@ -154,66 +155,3 @@ sched_freq = {
 }
 
 batch_exe_func = {"empty":"empty"} 
-
-
-def find_in_string(s, search_dict):
-    for key, value in search_dict.items():
-        if key in s:
-            # Separiamo la parte della stringa prima e dopo la chiave trovata
-            before_key, _, after_key = s.partition(key)
-            next_section = before_key + after_key
-            executed_function = find_in_string(next_section, appl)
-            return f"{key}:{value}" + "\nother: " + executed_function
-    return s
-
-
-def parse_string(input_str):
-    # Estrai l'ambiente (può essere un singolo carattere o un carattere più numero)
-    if input_str[1].isdigit():
-        environment = input_str[:2]
-        remaining_str = input_str[2:]
-    else:
-        environment = input_str[0]
-        remaining_str = input_str[1:]
-
-    # Estrai i successivi due caratteri per la funzione
-    function = remaining_str[:2]
-    
-    # Estrai il successivo carattere per il tipo di schedulazione
-    scheduling_type = remaining_str[2]
-    
-    # Estrai i successivi quattro caratteri per l'area
-    area = remaining_str[3:7]
-    
-    # Il resto della stringa, tranne l'ultimo carattere, è altro
-    other_info = remaining_str[7:-1]
-    
-    # L'ultimo carattere è la frequenza di schedulazione
-    scheduling_frequency = remaining_str[-1]
-
-
-    # Stampa o restituisci i valori ottenuti
-    result = {
-        "environment": environment,
-        "function": function,
-        "scheduling_type": scheduling_type,
-        "area": area,
-        "application": find_in_string(other_info, appl),
-        "scheduling_frequency": scheduling_frequency
-    }
-
-    return result
-
-# Esempio di utilizzo
-strings = [
-    "R1BAZCCCHAUTHDEBAGGAEXDAILYCHAING",
-    "R1BAJCCCHB0V02G",
-    "RGEZEDWHPORTINGFINMACBCHE"
-]
-
-for s in strings:
-    parsed = parse_string(s)
-    print(f"Parsing string: {s}")
-    for key, value in parsed.items():
-        print(f"{key}: {value}")
-    print("-" * 40)
